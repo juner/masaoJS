@@ -11,10 +11,6 @@ var MasaoConstruction =function(){
 		this.y = y;
 	}
 	Point.prototype = {
-		setX:function(x){ this.x = x; },
-		setY:function(y){ this.y = y; },
-		getX:function(){ return this.x; },
-		getY:function(){ return this,y; },
 		toString : function(){ return "point("+this.x+","+this.y+")"; }
 	};
 	function Size(width,height){
@@ -22,41 +18,48 @@ var MasaoConstruction =function(){
 		this.height = height;
 	}
 	Size.prototype = {
-		setWidth :function(width){ this.width = width; },
-		setHeight:function(height){ this.height = height; },
-		getWidth :function(){ return this.width; },
-		getHeight:function(){ return this.height; },
 		toString : function(){ return "size("+this.width+","+this.height+")"; }
 	};
 	function Rect(x,y,width,height){
 		if(x instanceof Point && y instanceof Size){
-			this.p =x;
-			this.s =y;
+			this.x =x.x;
+			this.y =x.y;
+			this.height = y.height;
+			this.width = y.width;
 		}else{
-			this.p = new Point(x,y);
-			this.s = new Size(width,height);
+			this.x =x;
+			this.y =y;
+			this.height =height;
+			this.width =width;
 		}
 	}
 	Rect.prototype = {
-		setX:function(x){this.p.x = x;},
-		setY:function(y){this.p.y = y;},
-		setPoint:function(p){ if(p instanceof Point)this.p =p; },
-		setWidth:function(width){this.s.width = width;},
-		setHeight:function(height){this.s.height = height;},
-		setSize:function(s){ if(s instanceof Size) this.s =s; },
-		getX:function(){return this.p.x;},
-		getY:function(){return this.p.y;},
-		getPoint:function(){return this.p;},
-		getWidth:function(){return this.s.width;},
-		getHeight:function(){return this.s.height;},
-		getSize:function(){return this.s;},
-		toString:function(){ return "rect("+this.p.x+","+this.p.y+","+this.s.width+","+this.s.height+")" ; }
+		toString:function(){ return "rect("+this.x+","+this.y+","+this.width+","+this.height+")" ; }
 	};
 	//設定
 	function MasaoConfig(){
-
+		this.init();
 	}
 	MasaoConfig.prototype={
+		init:function(){
+			this.filenames ={
+				title:'title.gif',
+				ending:'ending.gif',
+				gameover:'gameover.gif',
+				pattern:'pattern.gif',
+				haikei:null,
+				chizu:null
+			};
+			this.colors= {
+				score:new Color(255,255,0),
+				back:new Color(0,255,255),
+				grenade1:new Color(255,255,255),
+				grenade2:new Color(255,255,0),
+				mizunohadou:new Color(0,32,255),
+				firebar1:new Color(255,0,0),
+				firebar2:new Color(255,192,0),
+			};
+		},
 		stage_sky_padding:10,	//マップの上の余白
 		c_width:512,	//画面のXサイズ
 		c_height:320,	//画面のYサイズ
@@ -69,13 +72,8 @@ var MasaoConstruction =function(){
 		grenade_max:2,
 
 	//===========================================
-		filename_title:'image/title.gif',
-		filename_ending:'image/ending.gif',
-		filename_gameover:'image/gameover.gif',
-		filename_pattern:'image/pattern.gif',
-		filename_haikei:'image/haikei.gif',
-
-		scorecolor:new Color(255,255,0),
+		filenames:null,
+		colors:null,
 		moji_score:"SCORE",
 		moji_highscore:"HIGHSCORE",
 		moji_time:"TIME",
@@ -165,11 +163,8 @@ var MasaoConstruction =function(){
 		},
 		//ファイルを読み込む
 		loadFiles:function(){
-			var names=["title","ending","gameover","pattern","haikei"];
-			var files=[this.config.filename_title,this.config.filename_ending,this.config.filename_gameover,
-				   this.config.filename_pattern,this.config.filename_haikei];
-			for(var i=0,l=files.length;i<l;i++){
-				this.images[names[i]]=new UseImage(files[i]);
+			for(var key in this.config.filenames){
+				this.images[key]=new UseImage(this.config.filenames[key]);
 			}
 		},
 		//ミス
@@ -668,13 +663,19 @@ var MasaoConstruction =function(){
 	//===============================================
 		//背景を描画
 		drawBG:function(){
-			var mc=this.parent,ctx=mc.ctx,co=mc.config;
-			ctx.drawImage(mc.images.haikei.i,0,0,co.c_width,co.c_height,0,0,co.c_width,co.c_height);
+			var mc=this.parent,ctx=mc.ctx,co=mc.config,b=ctx.fillStyle;
+			ctx.fillStyle=co.colors.back.toString();
+			ctx.fillRect(0,0,co.c_width,co.c_height);
+			if(mc.images.haikei.ready){
+				ctx.drawImage(mc.images.haikei.i,0,0,co.c_width,co.c_height,0,0,co.c_width,co.c_height);
+			}
+			ctx.fillStyle = b;
 		},
 		//ブロックを描画
 		drawBlocks:function(){
 			var mc=this.parent,co=mc.config,map=this.map;
 			var my=Math.floor(this.scrolly/32);
+			if(my<0)my=0;
 			var cy=my*32-this.scrolly;
 			for(;cy<co.c_height && my<map.height;my++,cy+=32){
 				var thisline = map.map[my];
@@ -736,7 +737,7 @@ var MasaoConstruction =function(){
 
 			ctx.font="bold "+co.moji_size+"px 'Comic Sans MS','Arial',sans-serif";
 
-			ctx.fillStyle = co.scorecolor.toString();
+			ctx.fillStyle = co.colors.score.toString();
 			var str=co.moji_score+" "+this.score+" "+co.moji_highscore+" "+mc.highScore;
 			if(this.time != null){
 				str+=" "+co.moji_time+" "+this.time;
@@ -1531,7 +1532,7 @@ var MasaoConstruction =function(){
 
 			ctx.font="bold "+co.moji_size+"px 'Comic Sans MS','Arial',sans-serif";
 
-			ctx.fillStyle = co.scorecolor.toString();
+			ctx.fillStyle = co.colors.score.toString();
 			var str="";
 			if(this.jet>0){
 				str+=co.moji_jet+" "+this.jet+" ";

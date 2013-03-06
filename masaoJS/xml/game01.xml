@@ -471,8 +471,6 @@
 <!--  キャラクターパターンのファイル名                      -->
 <param name="filename_pattern" value="pattern.gif"/>
 
-<!--  背景画像のファイル名                                  -->
-<param name="filename_haikei" value="haikei.gif"/>
 
 
 <!--  ゲームの進行スピード  (10-300)                        -->
