@@ -24,6 +24,9 @@
 		mapStagesKeys:["","s","t","f"],
 		mapDefaultData:"............................................................"
 	};
+	/**
+	 * 取得したデータからparamを抜き出し、正男を設定して返す関数
+	 */
 	$.fn.generateMasaoConstruction = function(){
 		var imagePath = options.imageBasePath;
 		var _masaoData = $(this).find("param");
@@ -113,7 +116,7 @@
 	};
 })(jQuery,MasaoConstruction);
 
-//実行部 実際は表示したい場所に設g置
+//実行部 src指定時に URL末尾で?以降にidを指定することで表示先のcanvasをすることが出来る
 (function($,MC){
 $(document).ready(function(){
     var href = $("link[rel=masaoConstruction]",document).attr("href");
