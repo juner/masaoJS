@@ -118,6 +118,7 @@
 
 //実行部 src指定時に URL末尾で?以降にidを指定することで表示先のcanvasをすることが出来る
 (function($,MC){
+	$.generateMasaoConstructionSetting({imageBasePath:"image/"});
 	//読み込み時に末尾のscriptからidを取得する。
     var id = $("script:last").attr("src").replace(/[^?]*\?(.*)/,"$1");
 	$(document).ready(function(){
@@ -132,7 +133,7 @@
 	        masao.loadFiles();
 	        masao.loop();
 	        masao.title();
-	        //window.masaoData = masao; //debug用
+	        window.masaoData = masao; //debug用
 	    });
 	});
 })(jQuery,MasaoConstruction);

@@ -59,6 +59,7 @@ var MasaoConstruction =function(){
 				firebar1:new Color(255,0,0),
 				firebar2:new Color(255,192,0),
 			};
+			this.s= new Size(32,32);
 		},
 		stage_sky_padding:10,	//マップの上の余白
 		c_width:512,	//画面のXサイズ
@@ -82,9 +83,8 @@ var MasaoConstruction =function(){
 
 		moji_left:"LEFT",
 		moji_size:16,
-
-		grenade_color1:new Color(255,255,255),
-		grenade_color2:new Color(255,255,0),
+		//ベースサイズ(32x32)
+		s :null
 	};
 
 	//まさおコンストラクション
@@ -286,13 +286,15 @@ var MasaoConstruction =function(){
 	//描画==================================
 		//パターン描画
 		drawPattern:function(x,y,chip,direction){
-			var c10=Math.floor(chip/10);
+			var c10=Math.floor(chip/10),
+				w=this.config.s.width,
+				h=this.config.s.height;
 			if(direction==0){
-				this.ctx.drawImage(this.images.pattern.i,(chip%10)*32,c10*32,32,32,parseInt(x),parseInt(y),32,32);
+				this.ctx.drawImage(this.images.pattern.i,(chip%10)*w,c10*h,w,h,parseInt(x),parseInt(y),w,h);
 			}else{
 				this.ctx.save();
 				this.ctx.scale(-1,1);
-				this.ctx.drawImage(this.images.pattern.i,(chip%10)*32,c10*32,32,32,-parseInt(x)-32,parseInt(y),32,32);
+				this.ctx.drawImage(this.images.pattern.i,(chip%10)*w,c10*h,w,h,-parseInt(x)-w,parseInt(y),w,h);
 				this.ctx.restore();
 			}
 		},
@@ -319,7 +321,10 @@ var MasaoConstruction =function(){
 		MODE_GAMEOVER: 200,
 		MODE_ENDING: 300,
 		//描画
-
+		hasFocus:function(){
+			//TODO フォーカスしているかを返す[未実装]
+			return true;
+		}
 	};
 	var _mc =MasaoConstruction;
 	_mc.Color = Color;
@@ -428,6 +433,11 @@ var MasaoConstruction =function(){
 		enemys:{
 			"B":function(rx,ry){this.addEnemy(new Kame(this,rx,ry,1));return Field.IS_NORMAL_ENEMY;},
 			"C":function(rx,ry){this.addEnemy(new Kame(this,rx,ry,0));return Field.IS_NORMAL_ENEMY;},
+			"D":function(rx,ry){var s=32;
+				this.addEnemy(new Kame(this,rx,ry,0));
+				this.addEnemy(new Kame(this,rx+(s*2),ry,0));
+				this.addEnemy(new Kame(this,rx+(s*4),ry,0));
+				},
 			"E":function(rx,ry){this.addEnemy(new Pikachie(this,rx,ry));return Field.IS_NORMAL_ENEMY;},
 			"F":function(rx,ry){this.addEnemy(new Chikorin(this,rx,ry));return Field.IS_NORMAL_ENEMY;},
 			"G":function(rx,ry){this.addEnemy(new Hinorarashi(this,rx,ry));return Field.IS_NORMAL_ENEMY;},
@@ -1568,7 +1578,6 @@ var MasaoConstruction =function(){
 		function keydown(e){
 			if(!i.keys[e.keyCode])
 				i.keys[e.keyCode]=i.parent.counter;
-
 			switch(e.keyCode){
 			case 0x54:
 				//T
@@ -1581,6 +1590,13 @@ var MasaoConstruction =function(){
 					i.keys[e.keyCode]=false;
 				}
 				break;
+			}
+			if(i.isPressSpaceKey() && i.parent.hasFocus()){
+				if(e.preventDefault){
+					e.preventDefault();
+				}else{
+					return false;
+				}
 			}
 		}
 		function keyup(e){
@@ -3402,6 +3418,5 @@ var MasaoConstruction =function(){
                 window.setTimeout(callback, 1000 / 60);
               };
       })();
-
-	return _mc;
+	 return _mc;
 }();
