@@ -229,7 +229,6 @@ var MasaoConstruction =function(){
 
 			this.fps_count++;
 			if((new Date).getSeconds()!=this.bef){
-			//	document.getElementById("a").innerHTML="理想FPS: "+this.config.fps+"　実際FPS: "+this.fps_count;
 				this.fps_count=0;
 				this.bef=(new Date).getSeconds();
 			}
@@ -506,7 +505,6 @@ var MasaoConstruction =function(){
 		},
 		//仕掛けを追加
 		addAthletic:function(a){
-			alert(a instanceof Athletic);
 			if(a instanceof Athletic)this.athletics.push(a);
 		},
 		//アイテムを探す
@@ -1314,7 +1312,6 @@ var MasaoConstruction =function(){
 					cx = Math.floor((this.x+16)/32);
 					cy=Math.floor(this.y/32);
 					cy2=Math.floor((this.y+sy-1)/32);
-					//alert("foot:"+(!field.isBlockP(cx,cy2))+" , head:"+field.isBlockP(cx,cy));
 					if(!field.isBlockP(cx,cy2) && field.isBlockP(cx,cy)){
 						//はさまった！
 						this.y=cy2*32;
@@ -1569,7 +1566,6 @@ var MasaoConstruction =function(){
 		this.keyups={};
 
 		function keydown(e){
-	//		document.getElementById('a').innerHTML+="+"+e.keyCode;
 			if(!i.keys[e.keyCode])
 				i.keys[e.keyCode]=i.parent.counter;
 
@@ -1588,7 +1584,6 @@ var MasaoConstruction =function(){
 			}
 		}
 		function keyup(e){
-	//		document.getElementById('a').innerHTML+="-"+e.keyCode
 			i.keys[e.keyCode]=0;
 			i.keyups[e.keyCode]=i.parent.counter;
 		}
@@ -3363,8 +3358,6 @@ var MasaoConstruction =function(){
 	Dossunsun_faller.prototype=new Dossunsun;
 	Dossunsun_faller.prototype.doo=function(pl){
 		if(this.moving==0 && !this.incheck())return;
-		document.getElementById("a").innerHTML=!!this.ride;
-
 		this.doocommon(pl);
 		var mc=this.mc;
 

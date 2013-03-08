@@ -1,6 +1,6 @@
 (function($,MC){
 	var options ={
-		imageBasePath:"image/",
+		imageBasePath:"",
 		filenameSelecter:"[name^=filename_]",
 		filenameKeys:[
 		  	{key:"filename_title",name:"title"},
@@ -79,7 +79,7 @@
         	var colorKey = colorKeys[i];
         	var r = _colorData.filter("[name="+colorKey.r+"]").attr("value"),
         		g = _colorData.filter("[name="+colorKey.g+"]").attr("value"),
-        		b = _colorData.filter("[name"+colorKey.b+"]").attr("value"),
+        		b = _colorData.filter("[name="+colorKey.b+"]").attr("value"),
         		name = colorKey.name;
         	if(r && g && b){
         		config.colors[name] = new MC.Color(r,g,b);
@@ -118,20 +118,21 @@
 
 //実行部 src指定時に URL末尾で?以降にidを指定することで表示先のcanvasをすることが出来る
 (function($,MC){
-$(document).ready(function(){
-    var href = $("link[rel=masaoConstruction]",document).attr("href");
+	//読み込み時に末尾のscriptからidを取得する。
     var id = $("script:last").attr("src").replace(/[^?]*\?(.*)/,"$1");
-    var canvas = $("canvas#"+id).get(0);
-    $.ajax(href
-    ).fail(function(){
-        alert("読み込み失敗");
-    }).done(function(data){
-        var masao = $(data).generateMasaoConstruction();
-        masao.initCanvas(canvas);
-        masao.loadFiles();
-        masao.loop();
-        masao.title();
-        //window.masaoData = masao; //debug用
-    });
-});
+	$(document).ready(function(){
+	    var href = $("link[rel=masaoConstruction]",document).attr("href");
+	    var canvas = $("canvas#"+id).get(0);
+	    $.ajax(href
+	    ).fail(function(){
+	        alert("読み込み失敗");
+	    }).done(function(data){
+	        var masao = $(data).generateMasaoConstruction();
+	        masao.initCanvas(canvas);
+	        masao.loadFiles();
+	        masao.loop();
+	        masao.title();
+	        //window.masaoData = masao; //debug用
+	    });
+	});
 })(jQuery,MasaoConstruction);
