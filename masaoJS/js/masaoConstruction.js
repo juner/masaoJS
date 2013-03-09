@@ -303,7 +303,11 @@ var MasaoConstruction =function(){
 		c:function(name){
 			////return this[name].bind(this);
 			return (function(i){
-				return function(){ i[name].apply(i);};
+				if(name in i){
+					return function(){ i[name].apply(i);};
+				}else{
+					throw "don't have function “"+name+"”.";
+				}
 			})(this);
 		},
 		//効果音鳴らす
@@ -417,8 +421,9 @@ var MasaoConstruction =function(){
 		this.athletics=[];
 	}
 	Field.IS_NORMAL_ENEMY=0;
-	Field.IS_ITEM_BLOCK=40;
 	Field.IS_WATER_ENEMY=4;
+	Field.IS_ITEM_BLOCK=40;
+	Field.IS_BACKGROUND_BLOCK=400;
 	Field.prototype={
 		setMap:function(map){
 			this.map=map;
@@ -433,11 +438,7 @@ var MasaoConstruction =function(){
 		enemys:{
 			"B":function(rx,ry){this.addEnemy(new Kame(this,rx,ry,1));return Field.IS_NORMAL_ENEMY;},
 			"C":function(rx,ry){this.addEnemy(new Kame(this,rx,ry,0));return Field.IS_NORMAL_ENEMY;},
-			"D":function(rx,ry){var s=32;
-				this.addEnemy(new Kame(this,rx,ry,0));
-				this.addEnemy(new Kame(this,rx+(s*2),ry,0));
-				this.addEnemy(new Kame(this,rx+(s*4),ry,0));
-				},
+			"D":function(rx,ry){var s=32;this.addEnemy(new Kame(this,rx,ry,0));this.addEnemy(new Kame(this,rx+(s*2),ry,0));this.addEnemy(new Kame(this,rx+(s*4),ry,0));},
 			"E":function(rx,ry){this.addEnemy(new Pikachie(this,rx,ry));return Field.IS_NORMAL_ENEMY;},
 			"F":function(rx,ry){this.addEnemy(new Chikorin(this,rx,ry));return Field.IS_NORMAL_ENEMY;},
 			"G":function(rx,ry){this.addEnemy(new Hinorarashi(this,rx,ry));return Field.IS_NORMAL_ENEMY;},
@@ -451,10 +452,7 @@ var MasaoConstruction =function(){
 			"W":function(rx,ry){this.addEnemy(new Taiking(this,rx,ry-16));return Field.IS_WATER_ENEMY;},
 			"X":function(rx,ry){this.addEnemy(new Kuragesso(this,rx,ry));return Field.IS_WATER_ENEMY;},
 			"k":function(rx,ry){this.addEnemy(new I_coin(this,rx,ry,this.parent.FPSgetV(-170),ry-32)); return Field.IS_ITEM_BLOCK;},
-			"l":function(rx,ry){
-				this.addEnemy(new I_coin(this,rx,ry,this.parent.FPSgetV(-170),ry-32));
-				this.addEnemy(new I_coin(this,rx,ry,this.parent.FPSgetV(-205),ry-64));
-				this.addEnemy(new I_coin(this,rx,ry,this.parent.FPSgetV(-240),ry-96));return Field.IS_ITEM_BLOCK;},
+			"l":function(rx,ry){this.addEnemy(new I_coin(this,rx,ry,this.parent.FPSgetV(-170),ry-32));this.addEnemy(new I_coin(this,rx,ry,this.parent.FPSgetV(-205),ry-64));this.addEnemy(new I_coin(this,rx,ry,this.parent.FPSgetV(-240),ry-96));return Field.IS_ITEM_BLOCK;},
 			"m":function(rx,ry){this.addEnemy(new I_FireFlower(this,rx,ry));return Field.IS_ITEM_BLOCK;},
 			"n":function(rx,ry){this.addEnemy(new I_Barrier(this,rx,ry));return Field.IS_ITEM_BLOCK;},
 			"o":function(rx,ry){this.addEnemy(new I_Time(this,rx,ry));return Field.IS_ITEM_BLOCK;},
@@ -490,17 +488,13 @@ var MasaoConstruction =function(){
 					var rx=x*32,ry=y*32+co.stage_sky_padding*32;
 
 					var code=0;
-						//敵---------------------------------------------------
+					//敵
 					if(char in this.enemys){
 						code = this.enemys[char].call(this,rx,ry);
-					}else{
-						//ブロック
-						if(this.blocks[char]){
-							code=this.blocks[char];
-						}else if("0"<=char && char<="9"){
-						//障害物------------------------------------------------
-							code=parseInt(char);
-						}
+					}else
+					//ブロック
+					if(char in this.blocks){
+						code=this.blocks[char];
 					}
 					newline[newline.length]=code;
 				}
@@ -704,22 +698,21 @@ var MasaoConstruction =function(){
 		drawelse:function(x,y,chip){
 			var mc=this.parent;
 			switch(chip){
-				case 4://水
-					mc.drawPattern(x,y,4,0);
-					break;
-				case 5://下トゲ
-					mc.drawPattern(x,y,5,0);
-					break;
-				case 6://上トゲ
-					mc.drawPattern(x,y,6,0);
-					break;
-				case 8://星
-					mc.drawPattern(x,y,this.enemyAC>=8?94:95,0);
-					break;
-				case 9://コイン
-					var acc=this.enemyAC%8;
-					mc.drawPattern(x,y,acc>=6?93:acc>=4?92:acc>=2?91:90,0);
-					break;
+			case 1://雲(左)
+			case 2://雲(右)
+			case 3://叢
+			case 4://水
+			case 5://下トゲ
+			case 6://上トゲ
+				mc.drawPattern(x,y,chip,0);
+				break;
+			case 8://星
+				mc.drawPattern(x,y,this.enemyAC>=8?94:95,0);
+				break;
+			case 9://コイン
+				var acc=this.enemyAC%8;
+				mc.drawPattern(x,y,acc>=6?93:acc>=4?92:acc>=2?91:90,0);
+				break;
 			}
 		},
 		//敵を描画
@@ -760,7 +753,7 @@ var MasaoConstruction =function(){
 	function BlockData(){
 	}
 	BlockData.prototype={
-		"a":20,"b":21,"c":22,"d":23,"e":24,"f":25,"g":26,"h":27,"i":28,"j":29,".":0
+		"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"a":20,"b":21,"c":22,"d":23,"e":24,"f":25,"g":26,"h":27,"i":28,"j":29,".":0
 	};
 	_mc.BlockData = BlockData;
 	//主人公
@@ -1810,6 +1803,8 @@ var MasaoConstruction =function(){
 	}
 	Walker.prototype=new Creature;
 	Walker.prototype.speed=2;
+	Walker.WALK_MODE_DROP = 0;//歩く際に落ちる
+	Walker.WALK_MODE_UNDROP = 1;//歩く際に落ちない
 	Walker.prototype.walk=function(mode){
 		//mode:0なら落ちる　1なら落ちない
 		var field=this.parent;
@@ -1854,7 +1849,7 @@ var MasaoConstruction =function(){
 					}
 				}
 			}
-			if(mode==1){
+			if(mode==Walker.WALK_MODE_UNDROP){
 				//落ちない処理
 				cy=parseInt((this.y+szy)/32);
 				if(this.direction==0){
@@ -2341,7 +2336,7 @@ var MasaoConstruction =function(){
 				this.s_flg=2;
 
 			}else if(this.s_flg==2 && this.counter>24 && this.counter<=24+32){
-				this.walk(2);
+				this.walk(Walker.WALK_MODE_UNDROP);
 				if(this.counter==24+32){
 					this.walking=false;
 					this.direction^=1;
@@ -2356,7 +2351,7 @@ var MasaoConstruction =function(){
 				this.walking=true;
 				this.s_flg=5;
 			}else if(this.s_flg==5 && this.counter>115 && this.counter<=115+32){
-				this.walk(2);
+				this.walk(Walker.WALK_MODE_UNDROP);
 				if(this.counter==115+32){
 					this.walking=false;
 				}
