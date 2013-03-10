@@ -1,9 +1,9 @@
 (function($,MC,undefined){
 	if($===undefined){
-		throw "jQuery don't loaded.";
+		throw "jQuery ison't loaded.";
 	}
 	if(MC===undefined){
-		throw "MasaoConstruction don't loaded.";
+		throw "MasaoConstruction isn't loaded.";
 	}
 	var methods ={
 			setKeyEvent:function(key_code,masao,d){
