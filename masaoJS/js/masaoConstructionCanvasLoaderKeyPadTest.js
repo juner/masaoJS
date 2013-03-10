@@ -15,6 +15,7 @@
     		alert(txt+":"+dest);
     	}
     }).done(function(txt,masao,canvas){
+    	$(canvas).addMasaoCostructionKeyPad(masao);
     	//成功時処理
     	window.masaoData = masao;//debug用
     });

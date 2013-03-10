@@ -136,7 +136,7 @@
 		        masao.loadFiles();
 		        masao.loop();
 		        masao.title();
-		        defer.resolve("success",masao);
+		        defer.resolve("success",masao,canvas);
 			});
 		}else{
 			defer.reject("error","this element is not canvas!");

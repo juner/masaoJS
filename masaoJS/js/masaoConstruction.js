@@ -328,6 +328,14 @@ var MasaoConstruction =function(){
 		hasFocus:function(){
 			//TODO フォーカスしているかを返す[未実装]
 			return true;
+		},
+		keyDown:function(key_code){
+			var keyEvent={keyCode:key_code};
+			this.key.keydown(keyEvent);
+		},
+		keyUp:function(key_code){
+			var keyEvent={keyCode:key_code};
+			this.key.keyup(keyEvent);
 		}
 	};
 	var _mc =MasaoConstruction;
@@ -705,6 +713,9 @@ var MasaoConstruction =function(){
 			case 5://下トゲ
 			case 6://上トゲ
 				mc.drawPattern(x,y,chip,0);
+				break;
+			case 7://蝋燭
+				mc.drawPattern(x,y,this.enemyAC>=8?96:97,0);
 				break;
 			case 8://星
 				mc.drawPattern(x,y,this.enemyAC>=8?94:95,0);
@@ -1567,9 +1578,10 @@ var MasaoConstruction =function(){
 		var i=this;
 		this.keys={};
 		this.keyups={};
-
+		var _i=0;
 		function keydown(e){
-			if(!i.keys[e.keyCode])
+			console.log("keydown:"+(_i++)+":"+e.keyCode);
+			if(!(e.keyCode in i.keys) || !i.keys[e.keyCode])
 				i.keys[e.keyCode]=i.parent.counter;
 			switch(e.keyCode){
 			case 0x54:
@@ -1591,12 +1603,13 @@ var MasaoConstruction =function(){
 					return false;
 				}
 			}
-		}
+		};
+		this.keydown = keydown;
 		function keyup(e){
 			i.keys[e.keyCode]=0;
 			i.keyups[e.keyCode]=i.parent.counter;
 		}
-
+		this.keyup = keyup;
 	}
 	KeyCapture.prototype={
 		isPress:function(code){
@@ -1635,12 +1648,15 @@ var MasaoConstruction =function(){
 			return (this.keys[39]>=this.parent.counter && this.keyups[39]>=this.parent.counter-6) ||
 			       (this.keys[102]>=this.parent.counter && this.keyups[102]>=this.parent.counter-6);
 		},
+		keydown:function(e){},
+		keyup:function(e){}
 	};
 	_mc.KeyCapture = KeyCapture;
 	function Enemy(p,x,y){
 		this.parent=p;	//Field
 		if(p)this.mc=p.parent;	//MasaoConstruction
 		this.x=x,this.y=y;
+
 		this.direction=0;
 
 		this.moving=0;	//活動中かどうか -1:消えました　0:未活動 1:活動中 2:死
