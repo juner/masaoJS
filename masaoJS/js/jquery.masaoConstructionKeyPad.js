@@ -6,14 +6,16 @@
 		throw "MasaoConstruction don't loaded.";
 	}
 	var methods ={
-			setKeyEvent:function(key_code,masao){
+			setKeyEvent:function(key_code,masao,d){
 				return $(this).on({
 					"touchstart mousedown":function(){
-						console.log("keydown");
+						if(d){
+							masao.keyDown(key_code);
+							masao.keyUp(key_code);
+						}
 						masao.keyDown(key_code);
 					},
 					"touchend mouseup":function(){
-						console.log("keyup");
 						masao.keyUp(key_code);
 					}
 				});

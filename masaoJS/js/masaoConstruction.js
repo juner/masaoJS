@@ -1580,7 +1580,6 @@ var MasaoConstruction =function(){
 		this.keyups={};
 		var _i=0;
 		function keydown(e){
-			console.log("keydown:"+(_i++)+":"+e.keyCode);
 			if(!(e.keyCode in i.keys) || !i.keys[e.keyCode])
 				i.keys[e.keyCode]=i.parent.counter;
 			switch(e.keyCode){
